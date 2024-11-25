@@ -35,3 +35,17 @@ export const getAllPlayer = async (req, res) => {
   res.status(500).json({ messsage: "Error fetching all players", error: error.message })
  }
 };
+
+export const getPlayer = async (req, res) => {
+ const {id} = req.params;
+ try {
+  const player = await Player.findOne({where: {id}});
+  if (!player) {
+   res.status(401).json({ message: "Player not found" })
+  };
+  res.status(201).json({ message: "Player found", player})
+ } catch(error) {
+  console.log("Error fetching player", error.message);
+  res.status(500).json({ message: "Error fetching player", error: error.message})
+ }
+};
