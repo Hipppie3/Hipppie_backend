@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './config/database.js';
 import playerRoutes from './routes/playerRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
 
 // Load enviornment from variables
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.use('/players', playerRoutes)
+app.use('/teams', teamRoutes)
 
 app.get('/', (req, res) => {
  res.send("Server is running with ES Module")
