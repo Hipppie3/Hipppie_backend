@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 import sequelize from './config/database.js';
 import playerRoutes from './routes/playerRoutes.js';
 import teamRoutes from './routes/teamRoutes.js';
-
 // Load enviornment from variables
+import setupAssociations from './models/associations.js';
+
+
 dotenv.config();
 
 const app = express();
@@ -14,6 +16,8 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
   credentials: true, // Allow cookies (if needed)
 };
+
+setupAssociations();
 
 const PORT = 5005;
 
