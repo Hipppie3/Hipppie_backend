@@ -9,12 +9,12 @@ if (!firstName || !lastName) {
  return res.status(400).json({ message: "First name and last name are required" });
 }
 try {
- const newPlayer = await Player.create({
+ const player = await Player.create({
   firstName,
   lastName,
   teamId: teamId || null,
  });
- res.status(201).json({ message: "Player created successfully", newPlayer })
+ res.status(201).json({ message: "Player created successfully", player })
 } catch(error) {
  console.error("Error creating player", error.message)
  res.status(500).json({ message: "Error creating player", error: error.message })
@@ -90,20 +90,28 @@ export const updatePlayer = async (req, res) => {
         return res.status(400).json({ message: `Team with id:${teamId} does not exist` });
       }
     }
+
     await player.update({
       firstName,
       lastName,
       ...(teamId !== undefined && { teamId }), // Only update teamId if provided
     });
 
+    // Refetch the updated player with the team relationship
+    const updatedPlayer = await Player.findOne({
+      where: { id },
+      include: [
+        {
+          model: Team,
+          as: 'team',
+          attributes: ['id', 'name'], // Include only necessary team attributes
+        },
+      ],
+    });
+
     return res.status(200).json({
       message: "Player updated successfully",
-      player: {
-        id: player.id, // Include the ID in the response
-        firstName: player.firstName,
-        lastName: player.lastName,
-        teamId: player.teamId,
-      },
+      player: updatedPlayer, // Return the fully updated player with the team
     });
   } catch (error) {
     console.error("Error updating player", error.message);
