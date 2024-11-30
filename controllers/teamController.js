@@ -1,4 +1,5 @@
 import Team from '../models/team.js';
+import Player from '../models/player.js'
 
 
 export const createTeam = async (req, res) => {
@@ -9,10 +10,10 @@ export const createTeam = async (req, res) => {
   }
 
  try{
-  const newTeam = await Team.create({
+  const team = await Team.create({
    name,
   });
-  return res.status(201).json({ message: "Team created succesfully", newTeam})
+  return res.status(201).json({ message: "Team created succesfully", team})
  } catch(error) {
   console.error("Error creating team", error.message)
   res.status(500).json({ message: "Error creating team", error: error.message })
@@ -21,11 +22,21 @@ export const createTeam = async (req, res) => {
 
 export const getAllTeam = async (req, res) => {
   try {
-    const team = await Team.findAll();
-    if (!team) {
+    const teams = await Team.findAll({
+      include: [
+        {
+          model: Player,
+          as: 'players',
+          required: false,
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+      ],
+    });
+
+    if (!teams) {
       return res.status(404).json({ message: "Teams not found"})
     }
-  return res.status(201).json({ message: "Teams found", team})
+  return res.status(201).json({ message: "Teams found", teams})
   } catch(error) {
     console.error("Error fetching teams", error.message)
     res.status(500).json({ message: "Error fetching teams", error: error.message })
@@ -35,7 +46,18 @@ export const getAllTeam = async (req, res) => {
 export const getTeam = async (req, res) => {
   const {id} = req.params;
   try {
-    const team = await Team.findOne({where: {id}})
+    const team = await Team.findOne({
+      where: {id},
+      include: [
+        {
+          model: Player,
+          as: 'players',
+          required: false,
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+      ],
+    });
+
     if (!team) {
       return res.status(404).json({ message: `Team with id:${id} not found` })
     }

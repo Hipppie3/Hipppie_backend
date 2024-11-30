@@ -72,34 +72,47 @@ export const getPlayer = async (req, res) => {
 
 
 export const updatePlayer = async (req, res) => {
- const {id} = req.params;
- const {firstName, lastName, teamId} = req.body;
- try {
-  const player = await Player.findOne({where: {id}})
-  if(!player) {
-   return res.status(404).json({ message: `Player with id:${id} not found`})
-  }
+  const { id } = req.params;
+  const { firstName, lastName, teamId } = req.body;
 
-      if (teamId) {
+  try {
+    const player = await Player.findOne({ where: { id } });
+    if (!player) {
+      return res.status(404).json({ message: `Player with id:${id} not found` });
+    }
+
+    if (teamId) {
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid teamId format. Must be a number." });
+      }
       const team = await Team.findOne({ where: { id: teamId } });
       if (!team) {
         return res.status(400).json({ message: `Team with id:${teamId} does not exist` });
       }
     }
+    await player.update({
+      firstName,
+      lastName,
+      ...(teamId !== undefined && { teamId }), // Only update teamId if provided
+    });
 
-  await player.update({ 
-   firstName, 
-   lastName,
-   teamId, });
-  return res.status(200).json({
-   message: "Player updated successfully",
-   player: {firstName: player.firstName, lastName: player.lastName, teamId: player.teamId}
-  })
- } catch(error) {
-  console.error("Error updating player", error.message)
-  res.status(500).json({ message: `Error updating player with id${id}`, error: error.message})
- }
+    return res.status(200).json({
+      message: "Player updated successfully",
+      player: {
+        id: player.id, // Include the ID in the response
+        firstName: player.firstName,
+        lastName: player.lastName,
+        teamId: player.teamId,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating player", error.message);
+    res
+      .status(500)
+      .json({ message: `Error updating player with id:${id}`, error: error.message });
+  }
 };
+
 
 
 
