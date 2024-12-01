@@ -39,8 +39,8 @@ export const getAllPlayer = async (req, res) => {
  };
   res.status(200).json({ message: "Players Found", players });
  } catch(error) {
-  console.log("Error fetching all players", error.message);
-  res.status(500).json({ messsage: "Error fetching all players", error: error.message })
+  console.error("Error fetching players", error.message);
+  res.status(500).json({ messsage: "Error fetching players", error: error.message })
  }
 };
 
@@ -63,7 +63,7 @@ export const getPlayer = async (req, res) => {
   };
   res.status(201).json({ message: "Player found", player})
  } catch(error) {
-  console.log("Error fetching player", error.message);
+  console.error("Error fetching player", error.message);
   res.status(500).json({ message: "Error fetching player", error: error.message})
  }
 };
@@ -133,7 +133,7 @@ export const deletePlayer = async (req, res) => {
   return res.status(404).json({ message: `Player with id:${id} not found`})
   }
   await player.destroy();
-  return res.status(200).json({ message: `Player deleted successfully`,
+  return res.status(200).json({ message: 'Player deleted successfully',
   player: { id: player.id, firstName: player.firstName, lastName: player.lastName }})
  } catch(error) {
   console.error(`Error deleting player with id:${id}`, error.message)
