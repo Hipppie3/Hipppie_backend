@@ -10,11 +10,18 @@ if (!firstName || !lastName) {
  return res.status(400).json({ message: "First name and last name are required" });
 }
 try {
- const player = await Player.create({
+ const newPlayer = await Player.create({
   firstName,
   lastName,
   teamId: teamId || null,
   sportId: sportId || null,
+ });
+ const player = await Player.findOne({
+  where: {id: newPlayer.id},
+  include: [
+    { model: Team, as: 'team', attributes: ['id', 'name'] },
+    { model: Sport, as: 'sport', attributes: ['id', 'name'] },
+  ],
  });
  res.status(201).json({ message: "Player created successfully", player })
 } catch(error) {
