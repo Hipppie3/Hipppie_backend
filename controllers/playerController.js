@@ -1,9 +1,10 @@
 import Player from '../models/player.js';
 import Team from '../models/team.js';
+import Sport from '../models/sport.js';
 
 
 export const createPlayer = async (req, res) => {
- const {firstName, lastName, teamId} = req.body;
+ const {firstName, lastName, teamId, sportId} = req.body;
 //Pre-validation before hitting the database
 if (!firstName || !lastName) {
  return res.status(400).json({ message: "First name and last name are required" });
@@ -13,6 +14,7 @@ try {
   firstName,
   lastName,
   teamId: teamId || null,
+  sportId: sportId || null,
  });
  res.status(201).json({ message: "Player created successfully", player })
 } catch(error) {
@@ -31,6 +33,11 @@ export const getAllPlayer = async (req, res) => {
      model: Team,
      as: 'team',
      attributes: ['id', 'name'],
+    },
+    {
+    model: Sport,
+    as: 'sport',
+    attribtues: ['id', 'name']
     },
    ],
   });
@@ -56,6 +63,11 @@ export const getPlayer = async (req, res) => {
    as: 'team',
    attributes: ['id', 'name'],
   },
+  {
+   model: Sport,
+   as: 'sport',
+   attributes: ['id', 'name'],
+  },
   ],
  });
   if (!player) {
@@ -73,7 +85,7 @@ export const getPlayer = async (req, res) => {
 
 export const updatePlayer = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, teamId } = req.body;
+  const { firstName, lastName, teamId, sportId } = req.body;
 
   try {
     const player = await Player.findOne({ where: { id } });
@@ -91,10 +103,21 @@ export const updatePlayer = async (req, res) => {
       }
     }
 
+    if (sportId){
+     if (isNaN(sportId)) {
+        return res.status(400).json({ message: "Invalid sportId format. Must be a number." });
+      }
+      const sport = await Sport.findOne({ where: { id: sportId } });
+      if (!sport) {
+        return res.status(400).json({ message: `Team with id:${sportId} does not exist` });
+      }
+    };
+
     await player.update({
       firstName,
       lastName,
       ...(teamId !== undefined && { teamId }), // Only update teamId if provided
+      ...(sportId !== undefined && { sportId }),
     });
 
     // Refetch the updated player with the team relationship
@@ -106,6 +129,11 @@ export const updatePlayer = async (req, res) => {
           as: 'team',
           attributes: ['id', 'name'], // Include only necessary team attributes
         },
+        {
+          model: Sport,
+          as: 'sport',
+          attributes: ['id', 'name'],
+        }
       ],
     });
 

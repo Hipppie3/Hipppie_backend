@@ -23,6 +23,14 @@ const Player = sequelize.define('Player', {
       key: 'id',
     },
   },
+  sportId: {
+  type: DataTypes.INTEGER,
+  allowNull: true,
+  references: {
+    model: 'Sports',
+    key: 'id',
+    },
+  },
 });
 
 

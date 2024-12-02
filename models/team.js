@@ -11,6 +11,14 @@ const Team = sequelize.define('Team', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  sportId: {
+  type: DataTypes.INTEGER,
+  allowNull: true,
+  references: {
+    model: 'Sports',
+    key: 'id',
+  },
+},
 });
 
 

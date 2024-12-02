@@ -1,9 +1,10 @@
 import Team from '../models/team.js';
-import Player from '../models/player.js'
+import Player from '../models/player.js';
+import Sport from '../models/sport.js';
 
 
 export const createTeam = async (req, res) => {
- const {name} = req.body;
+ const {name, sportId} = req.body;
 
  if (!name) {
    return res.status(400).json({ message: "Team name required" });
@@ -12,6 +13,7 @@ export const createTeam = async (req, res) => {
  try{
   const team = await Team.create({
    name,
+   sportId,
   });
   return res.status(201).json({ message: "Team created succesfully", team})
  } catch(error) {
@@ -29,6 +31,12 @@ export const getAllTeam = async (req, res) => {
           as: 'players',
           required: false,
           attributes: ['id', 'firstName', 'lastName'],
+        },
+        {
+          model: Sport,
+          as: 'sport',
+          required: false,
+          attributes: ['id', 'name']
         },
       ],
     });
@@ -55,6 +63,11 @@ export const getTeam = async (req, res) => {
           required: false,
           attributes: ['id', 'firstName', 'lastName'],
         },
+        {
+          model: Sport,
+          as: 'sport',
+          attributes: ['id', 'name']
+        },
       ],
     });
 
@@ -70,16 +83,16 @@ export const getTeam = async (req, res) => {
 
 export const updateTeam = async (req, res) => {
   const {id} = req.params;
-  const {name} = req.body;
+  const {name, sportId} = req.body;
   try {
     const team = await Team.findOne({where: {id}});
     if(!team) {
       return res.status(404).json({ message: `Team with id:${id} not found` })
     }
-    await team.update({ name });
+    await team.update({ name, sportId });
     return res.status(200).json( {
       message: "Team successfully updated",
-      team: { id: team.id, name: team.name }})
+      team: { id: team.id, name: team.name, sportId: team.sportId }})
   } catch(error) {
     console.error("Error updating team", error.message)
     res.status(500).json({ message: "Error updating team", error: error.message })

@@ -30,7 +30,7 @@ app.use('/teams', teamRoutes)
 app.use('/sports', sportRoutes)
 
 app.get('/', (req, res) => {
- res.send("Server is running with ES Module")
+res.send("Server is running with ES Module")
 });
 
 app.listen(PORT, ()=> console.log(`Server is running on PORT: ${PORT}`));
